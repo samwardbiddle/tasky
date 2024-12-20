@@ -1,7 +1,13 @@
+# Tasky
+
+This application is a simple todo list application that allows you to create, read, update, and delete tasks. It has been modified for a technical exercise.
+
 # Docker
-A Dockerfile has been provided to run this application.  The default port exposed is 8080.
+
+A Dockerfile has been provided to run this application. The default port exposed is 8080.
 
 # Environment Variables
+
 The following environment variables are needed.
 |Variable|Purpose|example|
 |---|---|---|
