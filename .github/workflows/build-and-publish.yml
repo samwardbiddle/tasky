@@ -22,8 +22,8 @@ env:
   ECR_REPOSITORY: tasky
 
 permissions:
-  id-token: write   # Required for AWS OIDC authentication
-  contents: read    # Required to checkout repository
+  id-token: write # Required for AWS OIDC authentication
+  contents: read # Required to checkout repository
 
 jobs:
   security-scan:
@@ -43,7 +43,10 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: "
+          scan-type: fs
+          format: "sarif"
+          output: "trivy-results.sarif"
+        continue-on-error: true
 
   build-and-push-image:
     runs-on: ubuntu-latest
