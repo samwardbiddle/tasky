@@ -1,7 +1,15 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+# This workflow performs security scanning and publishes a Docker image to Amazon ECR
+# It runs on pushes to the main branch and uses OIDC for secure AWS authentication
+#
+# Required setup:
+# 1. AWS IAM Role with ECR permissions and GitHub OIDC trust relationship
+# 2. AWS ECR repository named 'tasky'
+# 3. GitHub secret: AWS_ROLE_ARN with the IAM role ARN
+#
+# The workflow:
+# 1. Runs security scans using Gosec and Trivy
+# 2. Builds a Docker image from the repository
+# 3. Pushes the image to ECR with the 'latest' tag
 
 name: Build and Publish a Docker image
 
@@ -14,8 +22,8 @@ env:
   ECR_REPOSITORY: tasky
 
 permissions:
-  id-token: write
-  contents: read
+  id-token: write   # Required for AWS OIDC authentication
+  contents: read    # Required to checkout repository
 
 jobs:
   security-scan:
@@ -24,25 +32,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Run Gosec to scan Go code for security issues
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
           args: ./...
-        continue-on-error: true # This ensures the workflow continues even if issues are found
+        continue-on-error: true
 
+      # Run Trivy to scan for vulnerabilities in dependencies and containers
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: "fs"
-          format: "sarif"
-          output: "trivy-results.sarif"
-        continue-on-error: true
-
-      - name: Upload security scan results
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: "trivy-results.sarif"
-        if: always() # Always try to upload results, even if scans fail
+          scan-type: "
 
   build-and-push-image:
     runs-on: ubuntu-latest
